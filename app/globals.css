@@ -32,13 +32,47 @@
   }
 }
 
+html {
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-cream);
+}
+
 body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
   font-family: var(--font-dm-sans), system-ui, sans-serif;
-  background:
-    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--color-sage) 18%, transparent), transparent 34%),
-    radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--color-olive) 10%, transparent), transparent 28%),
-    var(--color-cream);
   color: var(--color-forest);
+  background: transparent;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 90rem 60rem at 8% -5%,
+      color-mix(in srgb, var(--color-sage) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 70rem 45rem at 100% 0%,
+      color-mix(in srgb, var(--color-olive) 14%, transparent),
+      transparent 65%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-cream) 0%,
+      color-mix(in srgb, var(--color-sage-muted) 40%, var(--color-cream)) 100%
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 ::selection {

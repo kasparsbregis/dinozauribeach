@@ -1,11 +1,12 @@
 import { auth, signIn, signOut } from "@/lib/auth";
+import { lv } from "@/lib/i18n/lv";
 import { Logo } from "@/components/Logo";
 import { NavLinks } from "@/components/NavLinks";
 import { Button } from "@/components/ui/Button";
 
 function GoogleIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 shrink-0">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -26,42 +27,57 @@ function GoogleIcon() {
   );
 }
 
-export async function SiteHeader() {
-  const session = await auth();
+function AuthButton({ signedIn }: { signedIn: boolean }) {
+  if (signedIn) {
+    return (
+      <form
+        action={async () => {
+          "use server";
+          await signOut();
+        }}
+      >
+        <Button
+          type="submit"
+          variant="secondary"
+          className="min-h-11 px-3 text-xs sm:px-4 sm:text-sm"
+        >
+          {lv.nav.signOut}
+        </Button>
+      </form>
+    );
+  }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl border border-sage-muted/80 bg-surface/90 px-4 py-3 shadow-[0_1px_3px_rgba(27,61,47,0.08)] backdrop-blur-md sm:px-5">
-        <Logo size={44} />
+    <form
+      action={async () => {
+        "use server";
+        await signIn("google");
+      }}
+    >
+      <Button type="submit" className="min-h-11 px-3 text-xs sm:px-4 sm:text-sm">
+        <GoogleIcon />
+        <span className="hidden sm:inline">{lv.nav.signIn}</span>
+      </Button>
+    </form>
+  );
+}
 
-        <nav className="flex items-center gap-2 text-sm sm:gap-3">
-          <NavLinks />
+export async function SiteHeader() {
+  const session = await auth();
+  const signedIn = Boolean(session?.user);
 
-          {session?.user ? (
-            <form
-              action={async () => {
-                "use server";
-                await signOut();
-              }}
-            >
-              <Button type="submit" variant="secondary" className="px-4 py-2 text-xs sm:text-sm">
-                Sign out
-              </Button>
-            </form>
-          ) : (
-            <form
-              action={async () => {
-                "use server";
-                await signIn("google");
-              }}
-            >
-              <Button type="submit" className="px-4 py-2 text-xs sm:text-sm">
-                <GoogleIcon />
-                <span className="hidden sm:inline">Sign in</span>
-              </Button>
-            </form>
-          )}
-        </nav>
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 px-[max(0.75rem,env(safe-area-inset-left))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 sm:pt-4">
+      <div className="mx-auto max-w-6xl rounded-2xl border border-sage-muted/80 bg-surface/90 px-3 py-3 shadow-[0_1px_3px_rgba(27,61,47,0.08)] backdrop-blur-md sm:px-5">
+        <div className="flex items-center justify-between gap-3">
+          <Logo size={40} className="sm:hidden" />
+          <Logo size={44} className="hidden sm:flex" />
+
+          <div className="flex items-center gap-2">
+            {signedIn && <NavLinks />}
+            <AuthButton signedIn={signedIn} />
+          </div>
+        </div>
       </div>
     </header>
   );

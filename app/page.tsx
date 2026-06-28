@@ -8,6 +8,7 @@ import { AvailabilityPicker } from "@/components/AvailabilityPicker";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { lv } from "@/lib/i18n/lv";
 
 export const dynamic = "force-dynamic";
 
@@ -39,66 +40,60 @@ export default async function HomePage() {
 
   if (!session?.user) {
     return (
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <section className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-          <div className="order-2 lg:order-1">
+      <div className="flex flex-1 flex-col items-center pt-6 max-lg:justify-start max-lg:pb-6 max-lg:pt-10 lg:min-h-0 lg:justify-center lg:overflow-hidden lg:pt-0">
+        <section className="grid w-full max-w-5xl grid-cols-1 items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <Card className="order-1 flex w-full flex-col items-center justify-center border-none bg-transparent p-0 shadow-none lg:order-2">
+            <div className="relative mx-auto w-fit">
+              <div
+                className="absolute inset-0 scale-110 rounded-full bg-olive/10 blur-2xl"
+                aria-hidden="true"
+              />
+              <Image
+                src="/dinozauri.webp"
+                alt={lv.brand.mascotAlt}
+                width={320}
+                height={320}
+                className="relative mx-auto block h-auto w-56 max-w-full rounded-full ring-4 ring-sage-muted shadow-[0_8px_30px_rgba(27,61,47,0.12)] sm:w-64 lg:w-96"
+                priority
+              />
+            </div>
+          </Card>
+
+          <div className="order-2 flex w-full flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
             <PageHeader
-              eyebrow="Beach volleyball"
-              title="Find the best tournament date"
-              description={
-                <>
-                  Sign in with Google, set your initials, and mark when you can play
-                  in July or August. Everyone can then see which dates work best for
-                  the group.
-                </>
-              }
+              eyebrow={lv.landing.eyebrow}
+              title={lv.landing.title}
+              description={lv.landing.description}
             />
 
-            <ul className="mt-8 space-y-3 text-sm text-muted">
-              <li className="flex items-center gap-2">
+            <ul className="mt-6 w-full max-w-md space-y-3 text-sm text-muted lg:mt-8 lg:max-w-none">
+              <li className="flex items-center justify-center gap-2 lg:justify-start">
                 <CalendarCheck2 className="h-4 w-4 shrink-0 text-olive" aria-hidden="true" />
-                Pick your free days on a shared calendar
+                {lv.landing.feature1}
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center gap-2 lg:justify-start">
                 <CalendarCheck2 className="h-4 w-4 shrink-0 text-olive" aria-hidden="true" />
-                See who is available on each date
+                {lv.landing.feature2}
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center gap-2 lg:justify-start">
                 <CalendarCheck2 className="h-4 w-4 shrink-0 text-olive" aria-hidden="true" />
-                Lock in the day with the most players
+                {lv.landing.feature3}
               </li>
             </ul>
 
             <form
-              className="mt-8"
+              className="mt-6 flex w-full justify-center lg:mt-8 lg:justify-start"
               action={async () => {
                 "use server";
                 await signIn("google");
               }}
             >
-              <Button type="submit" className="px-6 py-3">
+              <Button type="submit" className="w-full max-w-xs px-6 py-3 sm:w-auto">
                 <GoogleIcon />
-                Sign in with Google
+                {lv.nav.signInGoogle}
               </Button>
             </form>
           </div>
-
-          <Card className="order-1 flex flex-col items-center justify-center bg-gradient-to-br from-sage-muted/70 via-surface to-cream py-10 lg:order-2">
-            <div className="relative">
-              <div className="absolute inset-0 scale-110 rounded-full bg-olive/10 blur-2xl" aria-hidden="true" />
-              <Image
-                src="/dinozauri.webp"
-                alt="Dinozauri Beach mascot holding a volleyball"
-                width={280}
-                height={280}
-                className="relative rounded-full ring-4 ring-sage-muted shadow-[0_8px_30px_rgba(27,61,47,0.12)]"
-                priority
-              />
-            </div>
-            <p className="mt-6 max-w-xs text-center text-sm leading-6 text-muted">
-              Eight players. One perfect beach day. Let the dino help you find it.
-            </p>
-          </Card>
         </section>
       </div>
     );
@@ -111,13 +106,13 @@ export default async function HomePage() {
   const selectedDates = user ? await getUserAvailability(user.id) : [];
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 sm:px-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <PageHeader
-        eyebrow="Your schedule"
-        title="My availability"
+        eyebrow={lv.home.eyebrow}
+        title={lv.home.title}
         description={
           <>
-            Signed in as{" "}
+            {lv.home.signedInAs}{" "}
             <span className="font-medium text-forest">
               {session.user.name ?? session.user.email}
             </span>
@@ -132,9 +127,7 @@ export default async function HomePage() {
         <AvailabilityPicker selectedDates={selectedDates} />
       ) : (
         <Card dashed>
-          <p className="text-sm leading-6 text-muted">
-            Save your initials first, then you can pick the dates you are free.
-          </p>
+          <p className="text-sm leading-6 text-muted">{lv.home.initialsFirst}</p>
         </Card>
       )}
     </div>

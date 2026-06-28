@@ -1,17 +1,22 @@
 import { createHash } from "crypto";
 
+import { lv, TOURNAMENT_MONTHS_LV } from "@/lib/i18n/lv";
+
 export const TOURNAMENT_YEAR = 2026;
 
-export const TOURNAMENT_MONTHS = [
-  { index: 6, label: "July" },
-  { index: 7, label: "August" },
-] as const;
+export const TOURNAMENT_MONTHS = TOURNAMENT_MONTHS_LV;
 
 export function formatDateKey(year: number, month: number, day: number): string {
   const monthPart = String(month + 1).padStart(2, "0");
   const dayPart = String(day).padStart(2, "0");
   return `${year}-${monthPart}-${dayPart}`;
 }
+
+/** Dates that cannot be selected for the tournament */
+export const DISABLED_TOURNAMENT_DATES = new Set([
+  formatDateKey(TOURNAMENT_YEAR, 7, 1),
+  formatDateKey(TOURNAMENT_YEAR, 7, 2),
+]);
 
 export function parseDateKey(dateKey: string): Date {
   return new Date(`${dateKey}T12:00:00.000Z`);
@@ -47,6 +52,10 @@ export function isValidTournamentDateKey(dateKey: string): boolean {
   return day >= 1 && day <= daysInMonth;
 }
 
+export function isSelectableTournamentDate(dateKey: string): boolean {
+  return isValidTournamentDateKey(dateKey) && !DISABLED_TOURNAMENT_DATES.has(dateKey);
+}
+
 export function getAvatarUrl(email: string, image?: string | null): string {
   if (image) {
     return image;
@@ -60,7 +69,23 @@ export function getAvatarUrl(email: string, image?: string | null): string {
 }
 
 export function getWeekdayLabels(): string[] {
-  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return [...lv.weekdays];
+}
+
+const MONTH_GENITIVE: Record<number, string> = {
+  6: "jūlijs",
+  7: "augusts",
+};
+
+export function formatLatvianDisplayDate(dateKey: string): string {
+  const date = parseDateKey(dateKey);
+  const weekdayIndex = (date.getUTCDay() + 6) % 7;
+  const weekday = lv.weekdayNames[weekdayIndex];
+  const day = date.getUTCDate();
+  const month = date.getUTCMonth();
+  const monthName = MONTH_GENITIVE[month] ?? "";
+
+  return `${weekday}, ${day}. ${monthName}`;
 }
 
 export function getMonthGrid(year: number, month: number) {

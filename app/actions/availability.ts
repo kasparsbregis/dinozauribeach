@@ -1,19 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { lv } from "@/lib/i18n/lv";
 import { auth } from "@/lib/auth";
-import { isValidTournamentDateKey, parseDateKey } from "@/lib/dates";
+import { isSelectableTournamentDate, parseDateKey } from "@/lib/dates";
 import { prisma } from "@/lib/prisma";
 
 export async function updateInitials(initials: string) {
   const session = await auth();
   if (!session?.user?.email) {
-    throw new Error("You must sign in first.");
+    throw new Error(lv.errors.signInRequired);
   }
 
   const normalized = initials.trim().toUpperCase();
   if (!/^\p{L}{1,2}$/u.test(normalized)) {
-    throw new Error("Initials must be 1–2 letters.");
+    throw new Error(lv.errors.initialsInvalid);
   }
 
   await prisma.user.update({
@@ -28,11 +29,11 @@ export async function updateInitials(initials: string) {
 export async function toggleAvailability(dateKey: string) {
   const session = await auth();
   if (!session?.user?.id) {
-    throw new Error("You must sign in first.");
+    throw new Error(lv.errors.signInRequired);
   }
 
-  if (!isValidTournamentDateKey(dateKey)) {
-    throw new Error("Invalid date.");
+  if (!isSelectableTournamentDate(dateKey)) {
+    throw new Error(lv.errors.invalidDate);
   }
 
   const user = await prisma.user.findUnique({
@@ -41,7 +42,7 @@ export async function toggleAvailability(dateKey: string) {
   });
 
   if (!user?.initials) {
-    throw new Error("Set your initials before picking dates.");
+    throw new Error(lv.errors.initialsRequired);
   }
 
   const date = parseDateKey(dateKey);
